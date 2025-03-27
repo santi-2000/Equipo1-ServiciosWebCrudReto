@@ -16,7 +16,7 @@ Antes de comenzar, asegúrate de tener:
 Para iniciar una instancia de **SQL Server** en un contenedor Docker, ejecuta el siguiente comando en la terminal de tu **GitHub Codespace**:
 
 ```sh
-docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourPassword123!' \
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Pioner0s:D' \
    -p 1433:1433 --name sqlserver -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
@@ -29,7 +29,7 @@ source ~/.bashrc
 ```
 ### Usar sqlcmd para conectarse desde la terminal
 ```sh
-sqlcmd -S localhost -U sa -P YourPassword123!
+sqlcmd -S localhost -U sa -P Pioner0s:D
 ```
 
 # Probar servicios web
