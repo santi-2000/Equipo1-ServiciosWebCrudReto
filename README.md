@@ -29,7 +29,7 @@ source ~/.bashrc
 ```
 ### Usar sqlcmd para conectarse desde la terminal
 ```sh
-sqlcmd -S localhost -U sa -P Pioner0s:D
+sqlcmd -S localhost -U sa -P Pioner0s:D -i ./init_db.sql
 ```
 
 # Probar servicios web
