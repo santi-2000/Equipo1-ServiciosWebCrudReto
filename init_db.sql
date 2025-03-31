@@ -1,258 +1,212 @@
--- ---
--- Globals
--- ---
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'Data')
+BEGIN
+    CREATE DATABASE Data;
+END;
+GO
 
--- SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
--- SET FOREIGN_KEY_CHECKS=0;
+-- Cambiar al contexto de la base de datos 'Data'
+USE Data;
+GO
 
--- ---
--- Table 'Alumno'
--- 
--- ---
+-- Eliminar las tablas dependientes primero
+DROP TABLE IF EXISTS Responde;
+DROP TABLE IF EXISTS Comenta;
+DROP TABLE IF EXISTS ProfesorGrupo;
+DROP TABLE IF EXISTS GrupoMateria;
+DROP TABLE IF EXISTS GrupoClasifClase;
+DROP TABLE IF EXISTS Grupo;
+DROP TABLE IF EXISTS Permisos;
+DROP TABLE IF EXISTS Materia;
+DROP TABLE IF EXISTS Profesor;
+DROP TABLE IF EXISTS Departamento;
+DROP TABLE IF EXISTS PeriodoEscolar;
+DROP TABLE IF EXISTS Pregunta;
+DROP TABLE IF EXISTS Alumno;
 
-DROP TABLE IF EXISTS `Alumno`;
-		
-CREATE TABLE `Alumno` (
-  `matrícula` VARCHAR(7) NOT NULL DEFAULT 'NULL',
-  `nombre` VARCHAR(30) NOT NULL DEFAULT 'NULL',
-  `apellidoPaterno` VARCHAR(30) NOT NULL DEFAULT 'NULL',
-  `apellidoMaterno` VARCHAR(30) NOT NULL DEFAULT 'NULL',
-  `matrícula_Responde` INTEGER NULL DEFAULT NULL,
-  PRIMARY KEY (`matrícula`)
+-- Crear las tablas en el orden adecuado
+
+CREATE TABLE Departamento (
+  idDepartamento INT NOT NULL IDENTITY(1,1),
+  nombreDepartamento VARCHAR(20) NOT NULL,
+  PRIMARY KEY (idDepartamento)
 );
 
--- ---
--- Table 'Pregunta'
--- 
--- ---
+ALTER TABLE Departamento ALTER COLUMN nombreDepartamento VARCHAR(50);
 
-DROP TABLE IF EXISTS `Pregunta`;
-		
-CREATE TABLE `Pregunta` (
-  `idPregunta` INTEGER NOT NULL AUTO_INCREMENT DEFAULT NULL,
-  `pregunta` VARCHAR(60) NOT NULL DEFAULT 'NULL',
-  PRIMARY KEY (`idPregunta`)
+CREATE TABLE PeriodoEscolar (
+  idPeriodo INT NOT NULL IDENTITY(1,1),
+  fecha DATE NOT NULL,
+  PRIMARY KEY (idPeriodo)
 );
 
--- ---
--- Table 'PeriodoEscolar'
--- 
--- ---
-
-DROP TABLE IF EXISTS `PeriodoEscolar`;
-		
-CREATE TABLE `PeriodoEscolar` (
-  `idPeriodo` INT NOT NULL AUTO_INCREMENT DEFAULT NULL,
-  `fecha` DATE NOT NULL DEFAULT 'NULL',
-  PRIMARY KEY (`idPeriodo`)
+CREATE TABLE Materia (
+  clave INT NOT NULL,
+  nombre VARCHAR(50) NOT NULL,
+  idDepartamento INT NOT NULL,
+  PRIMARY KEY (clave),
+  FOREIGN KEY (idDepartamento) REFERENCES Departamento(idDepartamento)
 );
 
--- ---
--- Table 'Departamento'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Departamento`;
-		
-CREATE TABLE `Departamento` (
-  `idDepartamento` INT NOT NULL AUTO_INCREMENT DEFAULT NULL,
-  `nombreDepartamento` VARCHAR(20) NOT NULL DEFAULT 'NULL',
-  PRIMARY KEY (`idDepartamento`)
+CREATE TABLE Profesor (
+  matricula INT NOT NULL,  
+  nombre VARCHAR(20) NOT NULL,
+  apellidoPaterno VARCHAR(30) NOT NULL,
+  apellidoMaterno VARCHAR(30) NOT NULL,
+  rol VARCHAR(20) NOT NULL,
+  idDepartamento INT NOT NULL,
+  PRIMARY KEY (matricula),
+  FOREIGN KEY (idDepartamento) REFERENCES Departamento(idDepartamento)
 );
 
--- ---
--- Table 'Materia'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Materia`;
-		
-CREATE TABLE `Materia` (
-  `clave` INT NOT NULL DEFAULT NULL,
-  `nombre` VARCHAR(50) NOT NULL DEFAULT 'NULL',
-  `idDepartamento` INT NOT NULL AUTO_INCREMENT DEFAULT NULL,
-  PRIMARY KEY (`clave`)
+CREATE TABLE Alumno (
+  matricula VARCHAR(7) NOT NULL,
+  nombre VARCHAR(30) NOT NULL,
+  apellidoPaterno VARCHAR(30) NOT NULL,
+  apellidoMaterno VARCHAR(30) NOT NULL,
+  matricula_Responde INT NULL,
+  PRIMARY KEY (matricula)
 );
 
--- ---
--- Table 'Profesor'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Profesor`;
-		
-CREATE TABLE `Profesor` (
-  `matrícula` INT(9) NOT NULL DEFAULT NULL,
-  `nombre` VARCHAR(20) NOT NULL DEFAULT 'NULL',
-  `apellidoPaterno` VARCHAR(30) NOT NULL DEFAULT 'NULL',
-  `apellidoMaterno` VARCHAR(30) NOT NULL DEFAULT 'NULL',
-  `rol` VARCHAR(20) NOT NULL DEFAULT 'NULL',
-  `idDepartamento` INT NOT NULL AUTO_INCREMENT DEFAULT NULL,
-  PRIMARY KEY (`matrícula`)
+CREATE TABLE Pregunta (
+  idPregunta INT NOT NULL IDENTITY(1,1),
+  pregunta VARCHAR(60) NOT NULL,
+  PRIMARY KEY (idPregunta)
 );
 
--- ---
--- Table 'Responde'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Responde`;
-		
-CREATE TABLE `Responde` (
-  `matrícula` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-  `idPregunta` INTEGER NULL DEFAULT NULL,
-  `CRN` INTEGER NULL DEFAULT NULL,
-  `respuesta` MEDIUMTEXT(100) NULL DEFAULT NULL,
-  PRIMARY KEY (`matrícula`, `idPregunta`, `CRN`)
+CREATE TABLE Grupo (
+  CRN INT NOT NULL,
+  idPeriodo INT NOT NULL,
+  clave INT NOT NULL,
+  PRIMARY KEY (CRN),
+  FOREIGN KEY (idPeriodo) REFERENCES PeriodoEscolar(idPeriodo),
+  FOREIGN KEY (clave) REFERENCES Materia(clave)
 );
 
--- ---
--- Table 'Comenta'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Comenta`;
-		
-CREATE TABLE `Comenta` (
-  `idPregunta` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-  `matrícula` INTEGER NULL DEFAULT NULL,
-  `CRN` INTEGER NULL DEFAULT NULL,
-  `comentario` MEDIUMTEXT(100) NULL DEFAULT NULL,
-  PRIMARY KEY (`idPregunta`, `matrícula`, `CRN`)
+CREATE TABLE Responde (
+  matricula VARCHAR(7) NOT NULL,
+  idPregunta INT NOT NULL,
+  CRN INT NOT NULL,
+  respuesta VARCHAR(MAX) NULL,
+  PRIMARY KEY (matricula, idPregunta, CRN),
+  FOREIGN KEY (matricula) REFERENCES Alumno(matricula),
+  FOREIGN KEY (idPregunta) REFERENCES Pregunta(idPregunta),
+  FOREIGN KEY (CRN) REFERENCES Grupo(CRN)
 );
 
--- ---
--- Table 'GrupoMateria'
--- 
--- ---
-
-DROP TABLE IF EXISTS `GrupoMateria`;
-		
-CREATE TABLE `GrupoMateria` (
-  `CRN` INT NOT NULL DEFAULT NULL,
-  `claveMateria` INT NOT NULL DEFAULT NULL,
-  PRIMARY KEY (`CRN`, `claveMateria`)
+CREATE TABLE Comenta (
+  idPregunta INT NOT NULL,
+  matricula VARCHAR(7) NOT NULL,
+  CRN INT NOT NULL,
+  comentario VARCHAR(MAX) NULL,
+  PRIMARY KEY (idPregunta, matricula, CRN),
+  FOREIGN KEY (idPregunta) REFERENCES Pregunta(idPregunta),
+  FOREIGN KEY (matricula) REFERENCES Alumno(matricula),
+  FOREIGN KEY (CRN) REFERENCES Grupo(CRN)
 );
 
--- ---
--- Table 'ProfesorGrupo'
--- 
--- ---
-
-DROP TABLE IF EXISTS `ProfesorGrupo`;
-		
-CREATE TABLE `ProfesorGrupo` (
-  `CRN` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-  `matrícula` INT(9) NOT NULL DEFAULT NULL,
-  PRIMARY KEY (`CRN`, `matrícula`)
+CREATE TABLE GrupoMateria (
+  CRN INT NOT NULL,
+  claveMateria INT NOT NULL,
+  PRIMARY KEY (CRN, claveMateria),
+  FOREIGN KEY (CRN) REFERENCES Grupo(CRN),
+  FOREIGN KEY (claveMateria) REFERENCES Materia(clave)
 );
 
--- ---
--- Table 'Permisos'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Permisos`;
-		
-CREATE TABLE `Permisos` (
-  `idPermisos` INT(2) NOT NULL AUTO_INCREMENT DEFAULT NULL,
-  `rol` VARCHAR(20) NOT NULL DEFAULT 'NULL',
-  PRIMARY KEY (`idPermisos`)
+CREATE TABLE ProfesorGrupo (
+  CRN INT NOT NULL,
+  matricula INT NOT NULL,
+  PRIMARY KEY (CRN, matricula),
+  FOREIGN KEY (CRN) REFERENCES Grupo(CRN),
+  FOREIGN KEY (matricula) REFERENCES Profesor(matricula)
 );
 
--- ---
--- Table 'Grupo'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Grupo`;
-		
-CREATE TABLE `Grupo` (
-  `CRN` INT NOT NULL DEFAULT NULL,
-  `clasifClase` VARCHAR(30) NOT NULL DEFAULT 'NULL',
-  `idPeriodo` INT NOT NULL AUTO_INCREMENT DEFAULT NULL,
-  `clave` INT NOT NULL DEFAULT NULL,
-  PRIMARY KEY (`CRN`)
+CREATE TABLE Permisos (
+  idPermisos INT NOT NULL IDENTITY(1,1),
+  rol VARCHAR(20) NOT NULL,
+  PRIMARY KEY (idPermisos)
 );
 
--- ---
--- Table 'GrupoClasifClase'
--- 
--- ---
-
-DROP TABLE IF EXISTS `GrupoClasifClase`;
-		
-CREATE TABLE `GrupoClasifClase` (
-  `CRN` INTEGER NOT NULL DEFAULT NULL,
-  `clasifClase` VARCHAR(30) NOT NULL DEFAULT 'NULL',
-  PRIMARY KEY (`CRN`, `clasifClase`)
+CREATE TABLE GrupoClasifClase (
+  CRN INT NOT NULL,
+  clasifClase VARCHAR(30) NOT NULL,
+  PRIMARY KEY (CRN, clasifClase),
+  FOREIGN KEY (CRN) REFERENCES Grupo(CRN)
 );
 
+--
 -- ---
--- Foreign Keys 
--- ---
+-- --- Test Data ---
 
-ALTER TABLE `Materia` ADD FOREIGN KEY (idDepartamento) REFERENCES `Departamento` (`idDepartamento`);
-ALTER TABLE `Profesor` ADD FOREIGN KEY (idDepartamento) REFERENCES `Departamento` (`idDepartamento`);
-ALTER TABLE `Responde` ADD FOREIGN KEY (matrícula) REFERENCES `Alumno` (`matrícula`);
-ALTER TABLE `Responde` ADD FOREIGN KEY (idPregunta) REFERENCES `Pregunta` (`idPregunta`);
-ALTER TABLE `Responde` ADD FOREIGN KEY (CRN) REFERENCES `Grupo` (`CRN`);
-ALTER TABLE `Comenta` ADD FOREIGN KEY (idPregunta) REFERENCES `Pregunta` (`idPregunta`);
-ALTER TABLE `Comenta` ADD FOREIGN KEY (matrícula) REFERENCES `Alumno` (`matrícula`);
-ALTER TABLE `Comenta` ADD FOREIGN KEY (CRN) REFERENCES `Grupo` (`CRN`);
-ALTER TABLE `GrupoMateria` ADD FOREIGN KEY (CRN) REFERENCES `Grupo` (`CRN`);
-ALTER TABLE `GrupoMateria` ADD FOREIGN KEY (claveMateria) REFERENCES `Materia` (`clave`);
-ALTER TABLE `ProfesorGrupo` ADD FOREIGN KEY (CRN) REFERENCES `Grupo` (`CRN`);
-ALTER TABLE `ProfesorGrupo` ADD FOREIGN KEY (matrícula) REFERENCES `Profesor` (`matrícula`);
-ALTER TABLE `Grupo` ADD FOREIGN KEY (idPeriodo) REFERENCES `PeriodoEscolar` (`idPeriodo`);
-ALTER TABLE `Grupo` ADD FOREIGN KEY (clave) REFERENCES `Materia` (`clave`);
-ALTER TABLE `GrupoClasifClase` ADD FOREIGN KEY (CRN) REFERENCES `Grupo` (`CRN`);
+-- Insertar Departamentos
+INSERT INTO Departamento (nombreDepartamento) VALUES
+('Ciencias Comp.'),
+('Matemáticas'),
+('Física');
 
--- ---
--- Table Properties
--- ---
+-- Insertar Materias
+INSERT INTO Materia (clave, nombre, idDepartamento) VALUES
+(101, 'Álgebra', 2),
+(202, 'Estructuras de Datos', 1),
+(303, 'Mecánica', 3);
 
--- ALTER TABLE `Alumno` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Pregunta` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `PeriodoEscolar` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Departamento` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Materia` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Profesor` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Responde` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Comenta` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `GrupoMateria` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `ProfesorGrupo` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Permisos` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `Grupo` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `GrupoClasifClase` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- Insertar Profesores (asegurando que los departamentos existen)
+INSERT INTO Profesor (matricula, nombre, apellidoPaterno, apellidoMaterno, rol, idDepartamento) VALUES
+(1, 'Carlos', 'López', 'Martínez', 'Docente', 1),
+(2, 'Ana', 'González', 'Ruiz', 'Coordinador', 2),
+(3, 'Luis', 'Fernández', 'Soto', 'Director', 3);
 
--- ---
--- Test Data
--- ---
+-- Insertar Periodos Escolares
+INSERT INTO PeriodoEscolar (fecha) VALUES
+('2024-01-01'),
+('2024-08-01');
 
--- INSERT INTO `Alumno` (`matrícula`,`nombre`,`apellidoPaterno`,`apellidoMaterno`,`matrícula_Responde`) VALUES
--- ('','','','','');
--- INSERT INTO `Pregunta` (`idPregunta`,`pregunta`) VALUES
--- ('','');
--- INSERT INTO `PeriodoEscolar` (`idPeriodo`,`fecha`) VALUES
--- ('','');
--- INSERT INTO `Departamento` (`idDepartamento`,`nombreDepartamento`) VALUES
--- ('','');
--- INSERT INTO `Materia` (`clave`,`nombre`,`idDepartamento`) VALUES
--- ('','','');
--- INSERT INTO `Profesor` (`matrícula`,`nombre`,`apellidoPaterno`,`apellidoMaterno`,`rol`,`idDepartamento`) VALUES
--- ('','','','','','');
--- INSERT INTO `Responde` (`matrícula`,`idPregunta`,`CRN`,`respuesta`) VALUES
--- ('','','','');
--- INSERT INTO `Comenta` (`idPregunta`,`matrícula`,`CRN`,`comentario`) VALUES
--- ('','','','');
--- INSERT INTO `GrupoMateria` (`CRN`,`claveMateria`) VALUES
--- ('','');
--- INSERT INTO `ProfesorGrupo` (`CRN`,`matrícula`) VALUES
--- ('','');
--- INSERT INTO `Permisos` (`idPermisos`,`rol`) VALUES
--- ('','');
--- INSERT INTO `Grupo` (`CRN`,`clasifClase`,`idPeriodo`,`clave`) VALUES
--- ('','','','');
--- INSERT INTO `GrupoClasifClase` (`CRN`,`clasifClase`) VALUES
--- ('','');
+-- Insertar Grupos (asegurando que los CRN y claves existen)
+INSERT INTO Grupo (CRN, idPeriodo, clave) VALUES
+(1001,  1, 101),
+(1002,  1, 202),
+(1003,  2, 303);
+
+-- Insertar Alumnos
+INSERT INTO Alumno (matricula, nombre, apellidoPaterno, apellidoMaterno, matricula_Responde) VALUES
+('A001', 'Juan', 'Pérez', 'Sánchez', NULL),
+('A002', 'María', 'Ramírez', 'López', NULL),
+('A003', 'Pedro', 'Díaz', 'Torres', NULL);
+
+-- Insertar Preguntas
+INSERT INTO Pregunta (pregunta) VALUES
+('¿Te gusta la materia?'),
+('¿Cómo calificarías al profesor?');
+
+-- Insertar GrupoMateria
+INSERT INTO GrupoMateria (CRN, claveMateria) VALUES
+(1001, 101),
+(1002, 202),
+(1003, 303);
+
+-- Insertar ProfesorGrupo
+INSERT INTO ProfesorGrupo (CRN, matricula) VALUES
+(1001, 1),
+(1002, 2),
+(1003, 3);
+
+-- Insertar Respuestas
+INSERT INTO Responde (matricula, idPregunta, CRN, respuesta) VALUES
+('A001', 1, 1001, 'Sí'),
+('A002', 2, 1002, 'Regular');
+
+-- Insertar Comentarios
+INSERT INTO Comenta (idPregunta, matricula, CRN, comentario) VALUES
+(1, 'A001', 1001, 'Me gusta la materia'),
+(2, 'A002', 1002, 'El profesor explica bien');
+
+-- Insertar Permisos
+INSERT INTO Permisos (rol) VALUES
+('Administrador'),
+('Docente'),
+('Coordinador');
+
+-- Insertar GrupoClasifClase
+INSERT INTO GrupoClasifClase (CRN, clasifClase) VALUES
+(1001, 'Teoría'),
+(1002, 'Laboratorio'),
+(1003, 'Teoría');
