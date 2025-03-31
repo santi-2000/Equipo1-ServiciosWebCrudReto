@@ -1,4 +1,4 @@
-# Servicios Web CRUD reto
+# Servicios Web CRUD reto Equipo 1
 
 Este repositorio contiene un ejercicio de conexión a una instancia de **SQL Server** que corre dentro de un contenedor Docker en **GitHub Codespaces** utilizando el paquete **pymssql** para Python.
 
