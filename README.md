@@ -1,4 +1,4 @@
-# Servicios Web CRUD para tabla en MSSQLServer
+# Servicios Web CRUD reto
 
 Este repositorio contiene un ejercicio de conexión a una instancia de **SQL Server** que corre dentro de un contenedor Docker en **GitHub Codespaces** utilizando el paquete **pymssql** para Python.
 
@@ -28,43 +28,31 @@ echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```
 ### Usar sqlcmd para conectarse desde la terminal
+Crear base de datos y despues acceder a la base de datos por sqlcmd
 ```sh
 sqlcmd -S localhost -U sa -P Pioner0s:D -i ./init_db.sql
+sqlcmd -S localhost -U sa -P Pioner0s:D -d Data
 ```
 
 # Probar servicios web
 
-## Prerequisitos
-
-- Se ejecutó previamente el programa *PythonSQLServerCrearTabla.py*, donde se creó la tabla y se agregaron los registros
-
-
 ### Ejecución de servidor de servicios web
 
-Ejecuta el siguiente comando en la terminal de tu **GitHub Codespace**:
+Ejecuta el siguiente comando en la terminal de tu **GitHub Codespace**: Das acceso a tu puerto haciendolo publico y con esto podras usar los servicios establecidos en el programa para la modificacion de la tabla.
 
 ```sh
-cd web\ services/
-python CRUDServer.py
+python ServiciosWeb.py
 
 ```
+### Ejemplo de servicio
 
-### Ejecución de cliente en Python que consume servicios
+Con la aplicacion de postman pegaremos la url que nos otorgan y asi podremos usar 
+Get, Post, Delete, Put
 
-Abra **otra** terminal (no cierre la terminal que está ejecutando el servidor), y ejecute el siguiente comando:
 ```sh
-cd web\ services/
-python testWS.py
+Get = URL / table / Nombre_tabla, podras ver las talas deseadas
+Get = URL / table / Nombre_tabla / Llave_primaria, con esto podras ver registros por id
+Post = URL / table / Nombre_tabla / Llave_primaria
 ```
 
-### Correr servidor web
-Modifique la siguiente línea en *index.html* para actualizar la dirección correcta de los servicios web
-```JavaScript
-const apiUrl = "http://localhost:2025/test";
-```
-
-De nuevo, abra **otra** terminal (no cierre la terminal que está ejecutando el servidor), y ejecute el siguiente comando:
-```sh
-python -m http.server 5500 --directory static
-```
 
