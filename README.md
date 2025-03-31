@@ -50,9 +50,21 @@ Con la aplicacion de postman pegaremos la url que nos otorgan y asi podremos usa
 Get, Post, Delete, Put
 
 ```sh
+Get = URL / table / NombreBaseDeDatos, con esto podras ver la base de datos entera
 Get = URL / table / Nombre_tabla, podras ver las talas deseadas
 Get = URL / table / Nombre_tabla / Llave_primaria, con esto podras ver registros por id
-Post = URL / table / Nombre_tabla / Llave_primaria
+Post = URL / table / Nombre_tabla, se debera insertar datos en formato Json, ejemplo
+{
+    "id":5,
+    "name": "Alberto",
+    "email": "hojo@hojo"
+}
+Put = URL / table / Nombre_tabla / Llave, podras actulizar los datos de cualquier usuario, se debe insertar en formato Json, ejemplo,
+{
+    "name": "Alberto",
+    "email": "hojo@hojo"
+}
+Delete = URL / table / Nombre_tabla / Llave, podras borrar informacion por usuario.
 ```
 
 
