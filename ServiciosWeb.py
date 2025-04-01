@@ -11,7 +11,7 @@ port = 1433
 database = "Data"
 username = "sa"
 password = "Pioner0s:D"
-
+#hola
 # Database connection function
 def get_connection():
     return pymssql.connect(server=server, port=port, user=username, password=password, database=database)
