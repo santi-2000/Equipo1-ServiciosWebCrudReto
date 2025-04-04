@@ -41,6 +41,8 @@ sqlcmd -S localhost -U sa -P Pioner0s:D -d Data
 Ejecuta el siguiente comando en la terminal de tu **GitHub Codespace**: Das acceso a tu puerto haciendolo publico y con esto podras usar los servicios establecidos en el programa para la modificacion de la tabla.
 
 ```sh
+cd ServiciosWeb/
+
 python ServiciosWeb.py
 
 ```
