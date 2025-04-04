@@ -104,14 +104,6 @@ CREATE TABLE Comenta (
   FOREIGN KEY (CRN) REFERENCES Grupo(CRN)
 );
 
-CREATE TABLE GrupoMateria (
-  CRN INT NOT NULL,
-  claveMateria INT NOT NULL,
-  PRIMARY KEY (CRN, claveMateria),
-  FOREIGN KEY (CRN) REFERENCES Grupo(CRN),
-  FOREIGN KEY (claveMateria) REFERENCES Materia(clave)
-);
-
 CREATE TABLE ProfesorGrupo (
   CRN INT NOT NULL,
   matricula INT NOT NULL,
@@ -176,12 +168,6 @@ INSERT INTO Alumno (matricula, nombre, apellidoPaterno, apellidoMaterno, matricu
 INSERT INTO Pregunta (pregunta) VALUES
 ('¿Te gusta la materia?'),
 ('¿Cómo calificarías al profesor?');
-
--- Insertar GrupoMateria
-INSERT INTO GrupoMateria (CRN, claveMateria) VALUES
-(1001, 101),
-(1002, 202),
-(1003, 303);
 
 -- Insertar ProfesorGrupo
 INSERT INTO ProfesorGrupo (CRN, matricula) VALUES
