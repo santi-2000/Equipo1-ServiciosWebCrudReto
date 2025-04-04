@@ -1,25 +1,31 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
 import pymssql
+
+# Cargar las variables de entorno
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# Database configuration
-server = "localhost"
-port = 1433
-database = "Data"
-username = "sa"
-password = "Pioner0s:D"
+# Configuración de la base de datos desde .env
+server = os.getenv("DB_SERVER")
+port = int(os.getenv("DB_PORT"))
+database = os.getenv("DB_NAME")
+username = os.getenv("DB_USER")
+password = os.getenv("DB_PASSWORD")
 
-# Database connection function
+# Función de conexión
 def get_connection():
-    return pymssql.connect(server=server, port=port, user=username, password=password, database=database)
-
-@app.route('/Data', methods=['GET'])
-def get_database():
-    conn = get_connection()
-    cursor = conn.cursor(as_dict=True)
+    return pymssql.connect(
+        server=server,
+        port=port,
+        user=username,
+        password=password,
+        database=database
+    )
 
     # Obtener todas las tablas de la base de datos
     cursor.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'")
