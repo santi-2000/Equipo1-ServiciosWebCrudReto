@@ -125,6 +125,12 @@ CREATE TABLE GrupoClasifClase (
   FOREIGN KEY (CRN) REFERENCES Grupo(CRN)
 );
 
+CREATE TABLE Usuario (
+  matricula INT NOT NULL PRIMARY KEY, 
+  passwordHash VARBINARY(64) NOT NULL,
+  FOREIGN KEY (matricula) REFERENCES Profesor(matricula)
+);
+
 --
 -- ---
 -- --- Test Data ---
@@ -196,3 +202,8 @@ INSERT INTO GrupoClasifClase (CRN, clasifClase) VALUES
 (1001, 'Teoría'),
 (1002, 'Laboratorio'),
 (1003, 'Teoría');
+
+INSERT INTO Usuario (matricula, passwordHash) VALUES
+(1, HASHBYTES('SHA2_256', CONVERT(VARCHAR, 'Renata'))),
+(2, HASHBYTES('SHA2_256', CONVERT(VARCHAR, 'Renlo'))),
+(3, HASHBYTES('SHA2_256', CONVERT(VARCHAR, 'Dania')));
