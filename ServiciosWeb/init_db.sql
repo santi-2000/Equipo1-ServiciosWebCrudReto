@@ -194,8 +194,9 @@ INSERT INTO Comenta (idPregunta, matricula, CRN, comentario) VALUES
 -- Insertar Permisos
 INSERT INTO Permisos (rol) VALUES
 ('Administrador'),
-('Docente'),
-('Coordinador');
+('Director'),
+('Coordinador'),
+('Profesor');
 
 -- Insertar GrupoClasifClase
 INSERT INTO GrupoClasifClase (CRN, clasifClase) VALUES
